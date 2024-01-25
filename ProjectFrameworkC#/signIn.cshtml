@@ -9,15 +9,6 @@
         var email = Request.Form["email"];
         var passw = Request.Form["pass"];
 
-        if (email == "anasnakash@gmail.com" && passw == "123456")
-        {
-            Session["id_cust"] = 1;
-            Response.Redirect("Home.cshtml");
-
-        }
-        else
-        {
-
             using (var connect = new SqlConnection(@"Data Source=ANASNA;Initial Catalog=db_shop;User ID=sa;Password=Anas_2001"))
             {
                 connect.Open();
@@ -46,7 +37,7 @@
             }
         }
     }
-}
+
 
 
 <!DOCTYPE html>
