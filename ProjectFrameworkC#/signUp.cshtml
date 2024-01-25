@@ -1,0 +1,492 @@
+﻿@using System.Data.SqlClient
+@using System.Data
+
+@{
+
+    SqlConnection con = new SqlConnection(@"Data Source=ANASNA;Initial Catalog=db_shop;User ID=sa;Password=Anas_2001");
+
+    if (IsPost)
+    {
+        string name = Request["name"];
+        string email = Request["email"];
+        string phone = Request["phone"];
+        string pass = Request["pass"];
+        string cpass = Request["cpass"];
+
+        if (pass == cpass)
+        {
+
+            SqlCommand checkCmd = new SqlCommand("SELECT COUNT(*) FROM users WHERE email = @Email", con);
+            checkCmd.Parameters.AddWithValue("@Email", email);
+
+            con.Open();
+            int count = (int)checkCmd.ExecuteScalar();
+            con.Close();
+
+            if (count == 0)
+            {
+                SqlCommand insert = new SqlCommand("INSERT INTO users (u_name, email, password, phone) VALUES (@Name, @Email, @Pass, @Phone)", con);
+                insert.Parameters.AddWithValue("@Name", name);
+                insert.Parameters.AddWithValue("@Email", email);
+                insert.Parameters.AddWithValue("@Pass", pass);
+                insert.Parameters.AddWithValue("@Phone", phone);
+
+                con.Open();
+                int num = insert.ExecuteNonQuery();
+                con.Close();
+
+                if (num == 1)
+                {
+
+                    string[] message = { "User Registered Successfully!" };
+
+                    foreach (var messages in message)
+                    {
+                        Response.Write("<a href='#' class='succ' onclick='this.remove();'>" + message[0] + "</a>");
+                    }
+
+                    con.Open();
+
+                    var query = $"SELECT * FROM users WHERE email = '{email}' AND password = '{pass}'";
+                    using (var command = new SqlCommand(query, con))
+                    {
+                        var reader = command.ExecuteReader();
+
+                        if (reader.HasRows)
+                        {
+                            reader.Read();
+                            Session["id_cust"] = reader["U_Id"];
+                            Response.Redirect("Home.cshtml");
+                        }
+                    }
+                }
+            }
+            else
+            {
+                string[] message = { "Email is already in use" };
+
+                foreach (var messages in message)
+                {
+                    Response.Write("<a href='signIn.cshtml' class='U-exist' onclick='this.remove();'>" + message[0] + "</a>");
+                }
+            }
+
+        }
+        else
+        {
+            string[] message = { "Passwords Do Not Match" };
+
+            foreach (var messages in message)
+            {
+                Response.Write("<div class='message' onclick='this.remove();'>" + message[0] + "</div>");
+            }
+
+        }
+    }
+}
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="UTF-8">
+    <title>Registration-Page</title>
+    <link rel="icon" type="image/x-icon" href="~/Asset/images/smalLogo.png">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://unicons.iconscout.com/release/v4.0.0/css/line.css" />
+    <style>
+
+        import url('https://fonts.googleapis.com/css2?family=Poppins:wght@200;300;400;500;600;700&display=swap');
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins',sans-serif;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 10px;
+            background: url(Asset/css/bg-Su-Sin.jpg);
+            background-size: cover;
+            background-position: center;
+            overflow-y: auto;
+        }
+
+        .succ, .U-exist, .message {
+            color: white;
+            width: 30%;
+            position: absolute;
+            top: -108%;
+            padding: 15px 1px;
+            margin: 50%;
+            text-align: center;
+            font-size: 1.3em;
+            font-weight: 900;
+            cursor: pointer;
+            border-radius: 30px;
+            border: solid 9px black;
+            box-shadow: 31px 22px 11px 4px rgba(0,0,0,0.7);
+        }
+
+        .message {
+            background-color: red;
+        }
+
+        .U-exist {
+            background-color: rgba(234 244 37 / 82%);
+            color: black;
+            text-decoration: none;
+        }
+
+        .succ {
+            background-color: rgba(27, 184, 27, 0.852);
+            text-decoration: none;
+        }
+
+
+        .container {
+            max-width: 700px;
+            width: 100%;
+            background-color: #fff;
+            padding: 25px 30px;
+            border-radius: 5px;
+            box-shadow: 0 5px 10px rgba(0,0,0,0.15);
+        }
+
+            .container .title {
+                font-size: 25px;
+                font-weight: 500;
+                position: relative;
+            }
+
+                .container .title::before {
+                    content: "";
+                    position: absolute;
+                    left: 0;
+                    bottom: 0;
+                    height: 3px;
+                    width: 30px;
+                    border-radius: 5px;
+                    background: linear-gradient(135deg, #71b7e6, #9b59b6);
+                }
+
+        .content form .user-details {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin: 20px 0 12px 0;
+        }
+
+        form .user-details .input-box {
+            margin-bottom: 15px;
+            width: calc(100% / 2 - 20px);
+        }
+
+        form .input-box span.details {
+            display: block;
+            font-weight: 500;
+            margin-bottom: 5px;
+        }
+
+        .user-details .input-box input {
+            height: 45px;
+            width: 100%;
+            outline: none;
+            font-size: 16px;
+            border-radius: 5px;
+            padding-left: 15px;
+            border: 1px solid #ccc;
+            border-bottom-width: 2px;
+            transition: all 0.3s ease;
+        }
+
+            .user-details .input-box input:focus,
+            .user-details .input-box input:valid {
+                border-color: #9b59b6;
+            }
+
+        form .gender-details .gender-title {
+            font-size: 20px;
+            font-weight: 500;
+        }
+
+        form .category {
+            display: flex;
+            width: 80%;
+            margin: 14px 0;
+            justify-content: space-between;
+        }
+
+            form .category label {
+                display: flex;
+                align-items: center;
+                cursor: pointer;
+            }
+
+                form .category label .dot {
+                    height: 18px;
+                    width: 18px;
+                    border-radius: 50%;
+                    margin-right: 10px;
+                    background: #d9d9d9;
+                    border: 5px solid transparent;
+                    transition: all 0.3s ease;
+                }
+
+        #dot-1:checked ~ .category label .one,
+        #dot-2:checked ~ .category label .two,
+        #dot-3:checked ~ .category label .three {
+            background: #9b59b6;
+            border-color: #d9d9d9;
+        }
+
+        form .button {
+            height: 45px;
+            margin: 35px 0
+        }
+
+            form .button input {
+                height: 100%;
+                width: 100%;
+                border-radius: 5px;
+                border: none;
+                color: #fff;
+                font-size: 18px;
+                font-weight: 500;
+                letter-spacing: 1px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+                background: linear-gradient(135deg, #71b7e6, #9b59b6);
+            }
+
+                form .button input:hover {
+                    /* transform: scale(0.99); */
+                    background: linear-gradient(-135deg, #71b7e6, #9b59b6);
+                }
+
+        media(max-width: 584px) {
+            .container
+
+        {
+            max-width: 100%;
+        }
+
+        form .user-details .input-box {
+            margin-bottom: 15px;
+            width: 100%;
+        }
+
+        form .category {
+            width: 100%;
+        }
+
+        .content form .user-details {
+            max-height: 300px;
+            overflow-y: scroll;
+        }
+
+        .user-details::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        }
+
+        media(max-width: 459px) {
+            .container .content .category
+
+        {
+            flex-direction: column;
+        }
+
+        }
+
+        .signup {
+            position: relative;
+            display: inline-block;
+            margin-top: 50px;
+            font-family: 'Noto Sans', sans-serif;
+            left: 30%;
+        }
+
+            .signup a {
+                color: #3498db;
+                text-decoration: none;
+            }
+
+                .signup a:hover {
+                    text-decoration: underline;
+                }
+
+        .input-field, form .button {
+            margin: 25px 0;
+            position: relative;
+            height: 50px;
+            width: 100%;
+        }
+
+            .input-field input {
+                height: 100%;
+                width: 100%;
+                border: 1px solid silver;
+                padding-left: 15px;
+                outline: none;
+                font-size: 19px;
+                transition: .4s;
+            }
+
+            .input-field label, span.show {
+                position: absolute;
+                top: 43.5%;
+                transform: translateY(-50%);
+            }
+
+        span.cshow {
+            position: static;
+            top: 56%;
+            transform: translateY(-50%);
+        }
+
+        .input-field label {
+            left: 15px;
+            pointer-events: none;
+            color: grey;
+            font-size: 18px;
+            transition: .4s;
+        }
+
+        span.show {
+            position:static;
+            right: 420px;
+            color: #111;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            user-select: none;
+            visibility: hidden;
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        span.cshow {
+            right: 620px;
+            color: #111;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            user-select: none;
+            visibility: hidden;
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        input:valid ~ span.show, input:valid ~ span.cshow {
+            visibility: visible;
+        }
+
+        input::-webkit-inner-spin-button,
+        input::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+
+
+        *::-webkit-scrollbar {
+            width: 15px;
+            height: 15px;
+        }
+
+        *::-webkit-scrollbar-track {
+            background-color: antiquewhite;
+            border-radius: 50px;
+        }
+
+        *::-webkit-scrollbar-thumb {
+            background-color: rgb(0, 204, 255);
+            border-radius: 50px;
+        }
+
+
+
+        
+    </style>
+
+</head>
+<body>
+    <div class="container">
+        <div class="title">Registration</div>
+        <div class="content">
+            <form method="POST" action="~/signUp.cshtml">
+                <div class="user-details">
+                    <div class="input-box">
+                        <span class="details">Username</span>
+                        <input name="name" type="text" placeholder="Enter your username" required>
+                    </div>
+                    <div class="input-box">
+                        <span class="details">Email</span>
+                        <input name="email" type="text" placeholder="Enter your email" required>
+                    </div>
+                    <div class="input-box">
+                        <span class="details">Phone Number</span>
+                        <input name="phone" type="number" placeholder="Enter your number" required>
+                    </div>
+                        <div class="input-box">
+                            <span class="details">Password</span>
+                            <input class="pswrd" name="pass" type="password" placeholder="Enter your password" required>
+                            <span class="show">SHOW</span>
+                        </div>
+                            <div style="margin-left:25% " class="input-box">
+                                    <span class="details">Confirm Password</span>
+                                    <input class="cpswrd" name="cpass" type="password" placeholder="Confirm your password" required>
+                                    <span class="cshow">SHOW</span>
+                            </div>
+                        <div class="button">
+                            <input type="submit" value="Register">
+                        </div>
+                        <div class="signup">
+                             Already have an account?<a href="~/signIn.cshtml"> Sign In </a>
+                        </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        var input = document.querySelector('.pswrd');
+        var show = document.querySelector('.show');
+        show.addEventListener('click', active);
+
+        function active() {
+            if (input.type === "password") {
+                input.type = "text";
+                show.style.color = "#1da1f2";
+                show.textContent = "HIDE";
+            } else {
+                input.type = "password";
+                show.textContent = "SHOW";
+                show.style.color = "#111";
+            }
+        }
+
+        var cinput = document.querySelector('.cpswrd');
+        var cshow = document.querySelector('.cshow');
+        cshow.addEventListener('click', cactive);
+
+        function cactive() {
+            if (cinput.type === "password") {
+                cinput.type = "text";
+                cshow.style.color = "#1da1f2";
+                cshow.textContent = "HIDE";
+            } else {
+                cinput.type = "password";
+                cshow.textContent = "SHOW";
+                cshow.style.color = "#111";
+            }
+        }
+    </script>
+</body>
+</html>

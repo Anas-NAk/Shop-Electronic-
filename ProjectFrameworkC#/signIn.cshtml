@@ -1,0 +1,281 @@
+﻿@using System.Data.SqlClient
+
+
+@{
+    var message = new List<string>();
+
+    if (IsPost)
+    {
+        var email = Request.Form["email"];
+        var passw = Request.Form["pass"];
+
+        if (email == "anasnakash@gmail.com" && passw == "123456")
+        {
+            Session["id_cust"] = 1;
+            Response.Redirect("Home.cshtml");
+
+        }
+        else
+        {
+
+            using (var connect = new SqlConnection(@"Data Source=ANASNA;Initial Catalog=db_shop;User ID=sa;Password=Anas_2001"))
+            {
+                connect.Open();
+
+                var query = $"SELECT * FROM users WHERE email = '{email}' AND password = '{passw}'";
+                using (var command = new SqlCommand(query, connect))
+                {
+                    var reader = command.ExecuteReader();
+
+                    if (reader.HasRows)
+                    {
+                        reader.Read();
+                        Session["id_cust"] = reader["U_Id"];
+                        Response.Redirect("Home.cshtml");
+                    }
+                    else
+                    {
+                        string[] messagee = { "Incorrect Password Or Email!" };
+
+                        foreach (var messages in messagee)
+                        {
+                            Response.Write("<div class='message' onclick='this.remove();'>" + messagee[0] + "</div>");
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <title>Login-Page</title>
+    <link rel="icon" type="image/x-icon" href="~/Asset/images/smalLogo.png">
+    <link rel="shortcut icon" href="icon/Logo 1.png">
+    <style>
+        import url('https://fonts.googleapis.com/css?family=Montserrat:600|Noto+Sans|Open+Sans:400,700&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            text-align: center;
+            font-family: sans-serif;
+            justify-content: center;
+            background: url(Asset/css/bg-Su-Sin.jpg);
+            background-size: cover;
+            background-position: center;
+        }
+
+        .message {
+            z-index: 99;
+            color: white;
+            width: 30%;
+            position: absolute;
+            top: -108%;
+            padding: 15px 1px;
+            margin: 50%;
+            text-align: center;
+            font-size: 1.3em;
+            font-weight: 900;
+            cursor: pointer;
+            border-radius: 30px;
+            border: solid 9px black;
+            box-shadow: 31px 22px 11px 4px rgba(0,0,0,0.7);
+            background-color: red;
+        }
+
+        .container {
+            position: relative;
+            width: 400px;
+            background: white;
+            padding: 60px 40px;
+        }
+
+        header {
+            font-size: 40px;
+            margin-bottom: 60px;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .input-field, form .button {
+            margin: 25px 0;
+            position: relative;
+            height: 50px;
+            width: 100%;
+        }
+
+            .input-field input {
+                height: 100%;
+                width: 100%;
+                border: 1px solid silver;
+                padding-left: 15px;
+                outline: none;
+                font-size: 19px;
+                transition: .4s;
+            }
+
+        input:focus {
+            border: 1px solid #1DA1F2;
+        }
+
+        .input-field label, span.show {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+        }
+
+        .input-field label {
+            left: 15px;
+            pointer-events: none;
+            color: grey;
+            font-size: 18px;
+            transition: .4s;
+        }
+
+        span.show {
+            right: 20px;
+            color: #111;
+            font-size: 14px;
+            font-weight: bold;
+            cursor: pointer;
+            user-select: none;
+            visibility: hidden;
+            font-family: 'Open Sans', sans-serif;
+        }
+
+        input:valid ~ span.show {
+            visibility: visible;
+        }
+
+        input:focus ~ label,
+        input:valid ~ label {
+            transform: translateY(-33px);
+            background: white;
+            font-size: 16px;
+            color: #1DA1F2;
+        }
+
+        form .button {
+            margin-top: 30px;
+            overflow: hidden;
+            z-index: 111;
+        }
+
+        .button .inner {
+            position: absolute;
+            height: 100%;
+            width: 300%;
+            left: -100%;
+            z-index: -1;
+            transition: all .4s;
+            background: -webkit-linear-gradient(right,#00dbde,#fc00ff,#00dbde,#fc00ff);
+        }
+
+        .button:hover .inner {
+            left: 0;
+        }
+
+        .button button {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: none;
+            outline: none;
+            color: white;
+            font-size: 20px;
+            cursor: pointer;
+            font-family: 'Montserrat', sans-serif;
+        }
+
+        .container .auth {
+            margin: 35px 0 20px 0;
+            font-size: 19px;
+            color: grey;
+        }
+
+        .signup {
+            margin-top: 50px;
+            font-family: 'Noto Sans', sans-serif;
+        }
+
+        .signup a {
+            color: #3498db;
+            text-decoration: none;
+        }
+
+        .signup a:hover {
+            text-decoration: underline;
+        }
+
+        *::-webkit-scrollbar {
+            width: 15px;
+            height: 15px;
+        }
+
+        *::-webkit-scrollbar-track {
+            background-color: antiquewhite;
+            border-radius: 50px;
+        }
+
+        *::-webkit-scrollbar-thumb {
+            background-color: rgb(0, 204, 255);
+            border-radius: 50px;
+        }
+    </style>
+
+</head>
+<body>
+    <div class="container">
+        <header>Login-Page</header>
+        <form method="post" action="~/signIn.cshtml">
+            <div class="input-field">
+                <input name="email" type="text" required>
+                <label>Email or Username</label>
+            </div>
+            <div class="input-field">
+                <input name="pass" class="pswrd" type="password" required>
+                <span class="show">SHOW</span>
+                <label>Password</label>
+            </div>
+            <div class="button">
+                <div class="inner"></div>
+                <button>LOGIN</button>
+            </div>
+        </form>
+
+        <div class="signup">
+            Dont't have an account? <a href="~/signUp.cshtml">Sign Up</a>
+        </div>
+    </div>
+
+    <script >
+        var input = document.querySelector('.pswrd');
+        var show = document.querySelector('.show');
+        show.addEventListener('click', active);
+        function active() {
+        if (input.type === "password") {
+            input.type = "text";
+            show.style.color = "#1da1f2";
+            show.textcontent = "hide";
+        } else {
+            input.type = "password";
+            show.textcontent = "show";
+            show.style.color = "#111";
+        }
+}
+    </script>
+
+</body>
+</html>

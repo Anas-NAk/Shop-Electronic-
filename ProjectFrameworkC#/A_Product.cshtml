@@ -1,0 +1,311 @@
+﻿@using System.Data.SqlClient
+@using System.Data
+
+@{
+    SqlConnection con = new SqlConnection(@"Data Source=ANASNA;Initial Catalog=db_shop;User ID=sa;Password=Anas_2001");
+    SqlDataAdapter Query = new SqlDataAdapter("SELECT * FROM products", con);
+    DataTable data = new DataTable();
+    Query.Fill(data);
+
+
+    //###############  Code Delete product of Table  ###############
+
+    var idToDelete = Request.QueryString["id"];
+
+    if (!string.IsNullOrEmpty(idToDelete))
+    {
+        using (con)
+        {
+            con.Open();
+
+            var deleteQuery = $"DELETE FROM products WHERE P_Id = {idToDelete}";
+
+            using (SqlCommand command = new SqlCommand(deleteQuery, con))
+            {
+                command.ExecuteNonQuery();
+            }
+        }
+        Response.Redirect("A_product.cshtml");
+    }
+}
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Products Dashboard-Admin</title>
+    <link rel="icon" type="image/x-icon" href="~/Asset/images/smalLogo.png">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/normalize/5.0.0/normalize.min.css">
+    <link rel="stylesheet" href="~/Asset/css/P_style.css">
+
+    <style>
+        .up, .del {
+            text-align: center;
+            width: 100px;
+            color: black;
+            font-size: 15px;
+            font-weight: 600;
+            border: outset 3px azure;
+            border-radius: 30px;
+            text-decoration: none;
+            padding: 10px;
+            background-color: #cebe20;
+            transition: transform 0.6s ease-in-out;
+        }
+
+        .del {
+            background-color: #f02626;
+        }
+
+            .del:hover {
+                background-color: red;
+                transform: scale(1.2);
+                -webkit-transform: scale(1.2);
+                -moz-transform: scale(1.2);
+                border: outset 4px crimson;
+                color: white
+            }
+
+        .up:hover {
+            background-color: yellow;
+            transform: scale(1.2);
+            -webkit-transform: scale(1.2);
+            -moz-transform: scale(1.2);
+            border: outset 4px gold;
+        }
+    </style>
+</head>
+<body>
+    <!-- partial:index.partial.html -->
+    <div class="app-container">
+        <div class="sidebar">
+            <div class="sidebar-header">
+                <div class="app-icon">
+                    <a href="~/Home.cshtml">
+                        <img class="logo" src="~/Asset/images/Rlogo2.png">
+                    </a>
+                </div>
+            </div>
+                <ul class="sidebar-list">
+                    <li class="sidebar-list-item">
+                        <a href="~/Home.cshtml">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-home"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" /><polyline points="9 22 9 12 15 12 15 22" /></svg>
+                            <span>Home</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-list-item active">
+                        <a href="#">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-shopping-bag"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z" /><line x1="3" y1="6" x2="21" y2="6" /><path d="M16 10a4 4 0 0 1-8 0" /></svg>
+                            <span>Products</span>
+                        </a>
+                    </li>
+                    <li class="sidebar-list-item">
+                        <a href="~/A_Cart.cshtml">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-pie-chart"><path d="M21.21 15.89A10 10 0 1 1 8 2.83" /><path d="M22 12A10 10 0 0 0 12 2v10z" /></svg>
+                            <span>Reserved Products</span>
+                        </a>
+                    </li>
+                </ul>
+                <div class="account-info">
+                    <div class="account-info-picture">
+                        <img src="~/Asset/images/smalLogo.png" alt="Account">
+                    </div>
+                    <div class="account-info-name">Shop E.</div>
+                </div>
+            </div>
+            <div class="app-content">
+                <div class="app-content-header">
+                    <h1 class="app-content-headerText">Products</h1>
+                    <button class="mode-switch" title="Switch Theme">
+                        <svg class="moon" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" width="24" height="24" viewBox="0 0 24 24">
+                            <defs></defs>
+                            <path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"></path>
+                        </svg>
+                    </button>
+                    <a href="~/Upload.cshtml" class="app-content-headerButton">Add Product</a>
+                </div>
+                <div class="app-content-actions">
+                    <form action="" method="post">
+                        <input name="search" class="search-bar" placeholder="Search..." type="text">
+                    </form>
+                    <div class="app-content-actions-wrapper">
+                        <div class="filter-button-wrapper">
+                            <button class="action-button filter jsFilter"><span>Filter</span><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-filter"><polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" /></svg></button>
+                            <div class="filter-menu">
+                                <label>Category</label>
+
+                                <form action="" method="post">
+                                    <select name="category" id="">
+                                        <option value="all">All Categories</option>
+                                        <option value="Phone">Phone</option>
+                                        <option value="Laptop">Laptop</option>
+                                        <option value="SmartWatch"> SmartWatch</option>
+                                    </select>
+
+                                    <div class="filter-menu-buttons">
+                                        <button name="" class="filter-button reset">Reset</button>
+                                        <button name="apply" class="filter-button apply">Apply</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <button class="action-button list active" title="List View">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-list"><line x1="8" y1="6" x2="21" y2="6" /><line x1="8" y1="12" x2="21" y2="12" /><line x1="8" y1="18" x2="21" y2="18" /><line x1="3" y1="6" x2="3.01" y2="6" /><line x1="3" y1="12" x2="3.01" y2="12" /><line x1="3" y1="18" x2="3.01" y2="18" /></svg>
+                    </button>
+                    <button class="action-button grid " title="Grid View">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-grid"><rect x="3" y="3" width="7" height="7" /><rect x="14" y="3" width="7" height="7" /><rect x="14" y="14" width="7" height="7" /><rect x="3" y="14" width="7" height="7" /></svg>
+                    </button>
+                </div>
+       
+            <div class="products-area-wrapper tableView">
+                <div class="products-header">
+                    <div class="product-cell image">
+                        Items
+                        <button class="sort-button">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><path fill="currentColor" d="M496.1 138.3L375.7 17.9c-7.9-7.9-20.6-7.9-28.5 0L226.9 138.3c-7.9 7.9-7.9 20.6 0 28.5 7.9 7.9 20.6 7.9 28.5 0l85.7-85.7v352.8c0 11.3 9.1 20.4 20.4 20.4 11.3 0 20.4-9.1 20.4-20.4V81.1l85.7 85.7c7.9 7.9 20.6 7.9 28.5 0 7.9-7.8 7.9-20.6 0-28.5zM287.1 347.2c-7.9-7.9-20.6-7.9-28.5 0l-85.7 85.7V80.1c0-11.3-9.1-20.4-20.4-20.4-11.3 0-20.4 9.1-20.4 20.4v352.8l-85.7-85.7c-7.9-7.9-20.6-7.9-28.5 0-7.9 7.9-7.9 20.6 0 28.5l120.4 120.4c7.9 7.9 20.6 7.9 28.5 0l120.4-120.4c7.8-7.9 7.8-20.7-.1-28.5z" /></svg>
+                        </button>
+                    </div>
+                    <div class="product-cell category">
+                        Category<button class="sort-button">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><path fill="currentColor" d="M496.1 138.3L375.7 17.9c-7.9-7.9-20.6-7.9-28.5 0L226.9 138.3c-7.9 7.9-7.9 20.6 0 28.5 7.9 7.9 20.6 7.9 28.5 0l85.7-85.7v352.8c0 11.3 9.1 20.4 20.4 20.4 11.3 0 20.4-9.1 20.4-20.4V81.1l85.7 85.7c7.9 7.9 20.6 7.9 28.5 0 7.9-7.8 7.9-20.6 0-28.5zM287.1 347.2c-7.9-7.9-20.6-7.9-28.5 0l-85.7 85.7V80.1c0-11.3-9.1-20.4-20.4-20.4-11.3 0-20.4 9.1-20.4 20.4v352.8l-85.7-85.7c-7.9-7.9-20.6-7.9-28.5 0-7.9 7.9-7.9 20.6 0 28.5l120.4 120.4c7.9 7.9 20.6 7.9 28.5 0l120.4-120.4c7.8-7.9 7.8-20.7-.1-28.5z" /></svg>
+                        </button>
+                    </div>
+                    <div class="product-cell status-cell">
+                        Sales<button class="sort-button">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><path fill="currentColor" d="M496.1 138.3L375.7 17.9c-7.9-7.9-20.6-7.9-28.5 0L226.9 138.3c-7.9 7.9-7.9 20.6 0 28.5 7.9 7.9 20.6 7.9 28.5 0l85.7-85.7v352.8c0 11.3 9.1 20.4 20.4 20.4 11.3 0 20.4-9.1 20.4-20.4V81.1l85.7 85.7c7.9 7.9 20.6 7.9 28.5 0 7.9-7.8 7.9-20.6 0-28.5zM287.1 347.2c-7.9-7.9-20.6-7.9-28.5 0l-85.7 85.7V80.1c0-11.3-9.1-20.4-20.4-20.4-11.3 0-20.4 9.1-20.4 20.4v352.8l-85.7-85.7c-7.9-7.9-20.6-7.9-28.5 0-7.9 7.9-7.9 20.6 0 28.5l120.4 120.4c7.9 7.9 20.6 7.9 28.5 0l120.4-120.4c7.8-7.9 7.8-20.7-.1-28.5z" /></svg>
+                        </button>
+                    </div>
+                    <div class="product-cell sales">
+                        Price<button class="sort-button">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><path fill="currentColor" d="M496.1 138.3L375.7 17.9c-7.9-7.9-20.6-7.9-28.5 0L226.9 138.3c-7.9 7.9-7.9 20.6 0 28.5 7.9 7.9 20.6 7.9 28.5 0l85.7-85.7v352.8c0 11.3 9.1 20.4 20.4 20.4 11.3 0 20.4-9.1 20.4-20.4V81.1l85.7 85.7c7.9 7.9 20.6 7.9 28.5 0 7.9-7.8 7.9-20.6 0-28.5zM287.1 347.2c-7.9-7.9-20.6-7.9-28.5 0l-85.7 85.7V80.1c0-11.3-9.1-20.4-20.4-20.4-11.3 0-20.4 9.1-20.4 20.4v352.8l-85.7-85.7c-7.9-7.9-20.6-7.9-28.5 0-7.9 7.9-7.9 20.6 0 28.5l120.4 120.4c7.9 7.9 20.6 7.9 28.5 0l120.4-120.4c7.8-7.9 7.8-20.7-.1-28.5z" /></svg>
+                        </button>
+                    </div>
+
+                    <div class="product-cell price">
+                        Action<button class="sort-button">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 512 512"><path fill="currentColor" d="M496.1 138.3L375.7 17.9c-7.9-7.9-20.6-7.9-28.5 0L226.9 138.3c-7.9 7.9-7.9 20.6 0 28.5 7.9 7.9 20.6 7.9 28.5 0l85.7-85.7v352.8c0 11.3 9.1 20.4 20.4 20.4 11.3 0 20.4-9.1 20.4-20.4V81.1l85.7 85.7c7.9 7.9 20.6 7.9 28.5 0 7.9-7.8 7.9-20.6 0-28.5zM287.1 347.2c-7.9-7.9-20.6-7.9-28.5 0l-85.7 85.7V80.1c0-11.3-9.1-20.4-20.4-20.4-11.3 0-20.4 9.1-20.4 20.4v352.8l-85.7-85.7c-7.9-7.9-20.6-7.9-28.5 0-7.9 7.9-7.9 20.6 0 28.5l120.4 120.4c7.9 7.9 20.6 7.9 28.5 0l120.4-120.4c7.8-7.9 7.8-20.7-.1-28.5z" /></svg>
+                        </button>
+                    </div>
+                </div>
+
+                @{
+                        Random random = new Random();
+
+                        if (IsPost && Request["search"] != null)
+                        {
+                            SqlConnection conn = new SqlConnection(@"Data Source=ANASNA;Initial Catalog=db_shop;User ID=sa;Password=Anas_2001; MultipleActiveResultSets=true");
+
+
+                            var searchTerm = Request["search"];
+
+
+                            string search_query = "SELECT * FROM products WHERE P_name LIKE @searchTerm OR Category LIKE @searchTerm";
+
+                            SqlDataAdapter E_query = new SqlDataAdapter(search_query, conn);
+                            E_query.SelectCommand.Parameters.AddWithValue("@SearchTerm", "%" + searchTerm + "%");
+
+                            DataTable data_S = new DataTable();
+                            E_query.Fill(data_S);
+
+
+                            if (data_S.Rows.Count > 0)
+                            {
+                                foreach (DataRow row in data_S.Rows)
+                                {
+                                    <div class="products-row">
+                                        <div class="product-cell image">
+                                            <img src="@row["Image"]" alt="product1">
+                                            <center><span>@row["P_name"]</span></center>
+                                        </div>
+                                        <div class="product-cell category"><span class="cell-label">Category:</span>@row["Category"]</div>
+
+                                        <div class="product-cell sales"><span class="cell-label">Sales:</span>@random.Next(5, 31)</div>
+                                        <div class="product-cell price"><span class="cell-label">Price:</span>$@row["Price"]</div>
+
+                                        <div class="product-cell status-cell">
+                                            <a href='A_Product.cshtml?id=@row["P_Id"]' onclick='return confirm("Are you sure you want to delete?");' class='del'>Delete</a>
+                                            <a href='Update_P.cshtml?id=@row["P_Id"]' class='up'>Update</a>
+                                        </div>
+                                    </div>
+                                }
+
+                            }
+                            else
+                            {
+                                <h1 style="color: red; left: 500px; position: relative;">No results found.</h1>
+                            }
+                        }
+
+                        else if (IsPost && Request["apply"] != null && Request["category"] != "all")
+                        {
+                            SqlConnection connn = new SqlConnection(@"Data Source=ANASNA;Initial Catalog=db_shop;User ID=sa;Password=Anas_2001; MultipleActiveResultSets=true");
+
+                            var S_Category = Request["category"];
+
+                            string Category_query = "SELECT * FROM products WHERE Category LIKE @S_Category";
+
+                            SqlDataAdapter C_query = new SqlDataAdapter(Category_query, connn);
+                            C_query.SelectCommand.Parameters.AddWithValue("@S_Category", "%" + S_Category + "%");
+
+                            DataTable data_G = new DataTable();
+                            C_query.Fill(data_G);
+
+
+                            if (data_G.Rows.Count > 0)
+                            {
+
+                                foreach (DataRow row in data_G.Rows)
+                                {
+
+                                <div class="products-row">
+
+                                    <div class="product-cell image">
+                                        <img src="@row["Image"]" alt="product1">
+                                        <center><span>@row["P_name"]</span></center>
+                                    </div>
+                                    <div class="product-cell category"><span class="cell-label">Category:</span>@row["Category"]</div>
+
+                                    <div class="product-cell sales"><span class="cell-label">Sales:</span>@random.Next(5, 31)</div>
+                                    <div class="product-cell price"><span class="cell-label">Price:</span>$@row["Price"]</div>
+                                       
+                                    <div class="product-cell status-cell">
+                                            <a href='A_Product.cshtml?id=@row["P_Id"]' onclick='return confirm("Are you sure you want to delete?");' class='del'>Delete</a>
+                                            <a href='Update_P.cshtml?id=@row["P_Id"]' class='up'>Update</a>
+                                        </div>
+                                    </div>
+                                }
+                            }
+                        }
+                        else
+                        {
+                            foreach (DataRow row in data.Rows)
+                            {
+                                <div class="products-row">
+                                    <div class="product-cell image">
+                                        <img src="@row["Image"]" alt="product1">
+                                        <center><span>@row["P_name"]</span></center>
+                                    </div>
+                                    <div class="product-cell category"><span class="cell-label">Category:</span>@row["Category"]</div>
+
+                                    <div class="product-cell sales"><span class="cell-label">Sales:</span>@random.Next(5, 31)</div>
+                                    <div class="product-cell price"><span class="cell-label">Price:</span>$@row["Price"]</div>
+
+                                    <div class="product-cell status-cell">
+                                        <a href='A_Product.cshtml?id=@row["P_Id"]' onclick='return confirm("Are you sure you want to delete?");' class='del'>Delete</a>
+                                        <a href='Update_P.cshtml?id=@row["P_Id"]' class='up'>Update</a>
+                                    </div>
+                                </div>
+                            }
+                        }
+                  }
+
+                 </div>
+           </div>
+     </div>
+
+    <script src="~/Asset/js/P_script.js"></script>
+
+</body>
+</html>

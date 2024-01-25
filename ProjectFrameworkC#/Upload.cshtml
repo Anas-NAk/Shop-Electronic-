@@ -1,0 +1,207 @@
+﻿@using System.Data.SqlClient
+@using System.Data
+
+@{
+    SqlConnection con = new SqlConnection(@"Data Source=ANASNA;Initial Catalog=db_shop;User ID=sa;Password=Anas_2001");
+
+    if (IsPost)
+    {
+        string name = Request["name"];
+        string price = Request["price"];
+        string category = Request["category"];
+
+
+        var imageFile = Request.Files["image"];
+        string imageName = imageFile.FileName; // To fetch name of image on desktop
+        string imagePath = "images/" + imageName; // varible To store image in folder images with name
+        imageFile.SaveAs(Server.MapPath("~/" + imagePath)); // To send image to folder
+
+        SqlCommand insert = new SqlCommand("INSERT INTO products (P_Name, Price, Image , Category) VALUES (@Name, @Price, @Image , @Category)", con);
+        insert.Parameters.AddWithValue("@Name", name);
+        insert.Parameters.AddWithValue("@Price", price);
+        insert.Parameters.AddWithValue("@Category", category);
+        insert.Parameters.AddWithValue("@Image", imagePath);
+
+        con.Open();
+        int count = insert.ExecuteNonQuery();
+        con.Close();
+
+        string[] message = { "The product has been added successfully" };
+
+        foreach (var messages in message)
+        {
+            Response.Write("<a href='#' onclick='this.remove();'>" + message[0] + "</a>");
+        }
+        
+    }
+}
+
+
+
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8">
+    <title>Upload-Product Page</title>
+    <link rel="icon" type="image/x-icon" href="~/Asset/images/smalLogo.png">
+    <link rel="shortcut icon" href="icon/Logo 1.png">
+
+    <style>
+
+  
+
+        body {
+            background: url(Asset/css/AdobeStock_255081757-scaled.jpeg);
+            background-size: cover;
+            background-position: center;
+            text-align: center;
+            background-attachment: fixed;
+        }
+
+        *::-webkit-scrollbar {
+            width: 20px;
+            height: 5px;
+        }
+
+        *::-webkit-scrollbar-track {
+            background-color: #07091e;
+        }
+
+        *::-webkit-scrollbar-thumb {
+            background-color: rgb(0, 204, 255);
+        }
+
+        a {
+            color: white;
+            width: 30%;
+            position: absolute;
+            padding: 15px 1px;
+            text-align: center;
+            font-size: 1.3em;
+            font-weight: 900;
+            cursor: pointer;
+            border-radius: 30px;
+            border: solid 9px black;
+            box-shadow: 31px 22px 11px 4px rgba(0,0,0,0.7);
+            background-color: #1cff09;
+            color: black;
+            text-decoration: none;
+            left: 520px;
+        }
+
+        .main {
+            font-size:8px;
+            border-radius: 25%;
+            border: .4em solid black;
+            background-color: rgba(156, 151, 117, 0.724);
+            padding: .8em;
+            margin-top: 2%;
+            width: 40%;
+            size: fixed;
+            overflow: hidden;
+        }
+
+        h2 {
+            font-size: 2.5em;
+            border: .2em solid white;
+            border-radius: 50em;
+            /*             background-color: rgb(4, 238, 255);
+        */ display: inline-block;
+            padding: .3em;
+        }
+
+        .imge {
+            border-radius: 30%;
+            box-shadow: 38px 36px 10px 14px rgba(0,0,0,0.75);
+        }
+
+        b {
+            font-size: 2.5em;
+            color: black;
+        }
+
+        input, select {
+            font-size: 1em;
+            /* background-color:rgba(233, 219, 140, 0.689); */
+            border-radius: 20em;
+            padding: .3em;
+        }
+
+        .link, button, .choose {
+            color: black;
+            font-weight: bold;
+            width: 40%;
+            font-size: 1em;
+            /* background-color: rgb(93, 80, 6); */
+            border: .2em solid rgb(255, 255, 255);
+            border-radius: 20em;
+            padding: .2em;
+            margin: .4em;
+            text-decoration: none;
+            transition: 1s;
+        }
+
+            button:hover {
+                border: .2em solid rgb(255, 255, 255);
+                background-color: rgb(0, 0, 0);
+                color: white;
+            }
+
+            .link:hover {
+                border: .2em solid rgb(255, 255, 255);
+                background-color: rgb(0, 0, 0);
+                color: white;
+            }
+
+        input::-webkit-inner-spin-button,
+        input::-webkit-outer-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+
+        input[type="number"] {
+            -moz-appearance: textfield;
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <center>
+        <div class="main">
+            <h2>Add Products To Site</h2><br>
+            <img class="imge" src="~/Asset/css/14.jpg" width="40%"><br>
+
+            <form action="~/Upload.cshtml" method="post" enctype="multipart/form-data">
+                <!-- for upload image  successful -->
+                <b>
+                    <br> Product Name
+                    <input type="text" name='name' required><br>
+
+                    <br /> Product price
+                    <input min="10" type="number" name='price' required><br>
+
+                    <br> Category
+                    <select name="category">
+                        <option value="Phone">Phone</option>
+                        <option value="Laptop">Laptop</option>
+                        <option value="SmartWatch"> SmartWatch</option>
+                    </select><br>
+
+                    <input type="file" name='image' class='choose' required><br>
+
+                    <br><button name="add"> Add the product ↗️</button><br>
+            </form>
+
+            <form action="A_Product.cshtml" method="get">
+                <button  type="submit">All products</button>
+            </form>
+
+            <br><br>
+         
+
+        </div>
+    </center>
+</body>
+</html>
