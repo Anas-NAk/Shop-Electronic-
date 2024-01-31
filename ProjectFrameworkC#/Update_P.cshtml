@@ -164,7 +164,6 @@
     @{
         var idToUpdate = Request.QueryString["id"];
 
-        SqlConnection conn = new SqlConnection(@"Data Source=ANASNA;Initial Catalog=db_shop;User ID=sa;Password=Anas_2001");
         SqlDataAdapter query = new SqlDataAdapter($"SELECT * FROM products where P_id = {idToUpdate}", con);
         DataTable data = new DataTable();
         query.Fill(data);
