@@ -88,9 +88,6 @@
         }
     }
 
-
-    SqlConnection conn = new SqlConnection(@"Data Source=ANASNA;Initial Catalog=db_shop;User ID=sa;Password=Anas_2001; MultipleActiveResultSets=true");
-
     SqlDataAdapter query = new SqlDataAdapter($"SELECT Image,P_Name, Price, Quantity, r.P_Id, Category FROM Reserve as r JOIN products as p  on r.P_Id = p.P_Id WHERE r.C_ID = {id_cart}", conn);
     DataTable data = new DataTable();
     query.Fill(data);
