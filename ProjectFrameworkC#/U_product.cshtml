@@ -292,15 +292,12 @@
 
                     if (IsPost && Request["search"] != null)
                     {
-                        SqlConnection conn = new SqlConnection(@"Data Source=ANASNA;Initial Catalog=db_shop;User ID=sa;Password=Anas_2001; MultipleActiveResultSets=true");
-
-
                         var searchTerm = Request["search"];
 
 
                         string search_query = "SELECT * FROM products WHERE P_name LIKE @searchTerm OR Category LIKE @searchTerm";
 
-                        SqlDataAdapter E_query = new SqlDataAdapter(search_query, conn);
+                        SqlDataAdapter E_query = new SqlDataAdapter(search_query, con);
                         E_query.SelectCommand.Parameters.AddWithValue("@SearchTerm", "%" + searchTerm + "%");
 
                         DataTable data_S = new DataTable();
@@ -341,14 +338,11 @@
                     }
                     else if (IsPost && Request["apply"] != null && Request["category"] != "all")
                     {
-
-                        SqlConnection conn = new SqlConnection(@"Data Source=ANASNA;Initial Catalog=db_shop;User ID=sa;Password=Anas_2001; MultipleActiveResultSets=true");
-
                         var S_Category = Request["category"];
 
                         string search_query = "SELECT * FROM products WHERE Category LIKE @S_Category";
 
-                        SqlDataAdapter E_query = new SqlDataAdapter(search_query, conn);
+                        SqlDataAdapter E_query = new SqlDataAdapter(search_query, con);
                         E_query.SelectCommand.Parameters.AddWithValue("@S_Category", "%" + S_Category + "%");
 
                         DataTable data_G = new DataTable();
