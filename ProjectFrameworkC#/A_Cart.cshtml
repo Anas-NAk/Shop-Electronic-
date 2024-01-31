@@ -3,7 +3,6 @@
 @using System.Data
 
 @{
-    SqlConnection conn = new SqlConnection(@"Data Source=ANASNA;Initial Catalog=db_shop;User ID=sa;Password=Anas_2001; MultipleActiveResultSets=true");
 
     SqlDataAdapter query = new SqlDataAdapter($"SELECT Image, P_Name,U_Name, Price, Quantity, Category, R_Date" +
         $"                                      FROM products as p JOIN Reserve as r ON r.P_Id = p.P_Id " +
